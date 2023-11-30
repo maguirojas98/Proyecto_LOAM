@@ -64,6 +64,7 @@ export default function HomeScreen(){
                 loading? (
                     <Loading />
                 ):(
+                    
                     <ScrollView
                             showsVerticalScrollIndicator={false}
                             contentContainerStyle={{paddingBottom: 10}}
