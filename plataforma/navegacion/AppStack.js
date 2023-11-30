@@ -14,6 +14,8 @@ import HomeScreen from '../screens/HomeScreen';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomDrawer from '../components/CustomDrawer';
+import VideoScreen from '../screens/VideoScreen';
+import Notification from '../components/notifications';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -28,9 +30,11 @@ function Hamburguesa() {
         backgroundColor: 'black'
       },
       drawerActiveTintColor: 'yellow',
+      drawerInactiveTintColor: 'white'
     }}
     >
       <Drawer.Screen name="Inicio" options={{headerShown: false}} component={HomeScreen} />
+      <Drawer.Screen name="Notificacion" options={{headerShown: false}} component={Notification} />
     </Drawer.Navigator>
   );
 }
@@ -42,6 +46,7 @@ const AppStack = () => {
         <Stack.Screen name="Movie" options={{headerShown: false}} component={MovieScreen} />
         <Stack.Screen name="Person" options={{headerShown: false}} component={PersonScreen} />
         <Stack.Screen name="Search" options={{headerShown: false}} component={SearchScreen} />
+        <Stack.Screen name="VideoPlay" options={{headerShown: false}} component={VideoScreen} />
       </Stack.Navigator>
   );
 };
@@ -67,6 +72,7 @@ const CatalogoStack = () => {
       <Stack.Screen name="Movie" options={{headerShown: false}} component={MovieScreen} />
       <Stack.Screen name="Person" options={{headerShown: false}} component={PersonScreen} />
       <Stack.Screen name="Search" options={{headerShown: false}} component={SearchScreen} />
+      <Stack.Screen name="VideoPlay" options={{headerShown: false}} component={VideoScreen} />
     </Stack.Navigator>
   );
 }

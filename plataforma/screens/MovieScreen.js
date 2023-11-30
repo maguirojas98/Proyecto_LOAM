@@ -1,5 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { View,Text, ScrollView, TouchableOpacity, Dimensions, Image, StyleSheet, TextInput } from "react-native";
 import { ChevronLeftIcon } from "react-native-heroicons/outline";
 import {HeartIcon} from "react-native-heroicons/solid";
@@ -11,9 +11,28 @@ import MovieList from "../components/MovieList";
 import Loading from "../components/loading";
 import { fallbackMoviePoster, fetchMovieCredits, fetchMovieDetails, fetchSimilarMovies, image500 } from "../api/moviedb";
 import { AuthContext } from "../context/AuthContext";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { fetchComentarios } from "../api/api";
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';    
+import { Platform} from 'react-native';
 
 
 var {width,height} = Dimensions.get('window');
+
+Notifications.setNotificationHandler({
+    
+    handleNotification: async () => ({
+   
+      shouldShowAlert: true,
+   
+      shouldPlaySound: false,
+   
+      shouldSetBadge: false,
+   
+    }),
+   
+   });
 
 
 export default function MovieScreen(){
@@ -24,11 +43,21 @@ export default function MovieScreen(){
     const [similarMovies, setSimilarMovies] = useState([]);
     const [loading,setLoading]= useState(false);
     const [movie,setMovie]= useState({});
-    let moviename ='pelicula';
 
     const { crearComentario, userInfo, buscarComentarios } = useContext(AuthContext);
     const [textoComentario, setTextoComentario] = useState('');
     const [comentarios, setComentarios] = useState([]);
+
+
+    useEffect(()=>{
+        getComentarios();
+    },[])
+
+    const getComentarios = async ()=>{
+        const data = await fetchComentarios();
+        //console.log(data);
+        setComentarios(data.data);
+    }
 
     useEffect(()=>{
         setLoading(true);
@@ -37,16 +66,7 @@ export default function MovieScreen(){
         getSimilarMovie(item.id);
     },[item])
 
-    useEffect(() => {
-        getComentarios();
-    }, [])
-
-    const getComentarios = async () => {
-        const data = await buscarComentarios();
-        setComentarios(data.data);
-        //console.log(data.data);
-    }
-
+    
     const getMovieDetails = async id=>{
         const data = await fetchMovieDetails(id);
         if(data) setMovie(data);
@@ -81,6 +101,52 @@ export default function MovieScreen(){
         }
     };
 
+    const [expoPushToken, setExpoPushToken] = useState('');
+    
+    const [notification, setNotification] = useState(false);
+    
+    const notificationListener = useRef();
+    
+    const responseListener = useRef();
+    
+    
+     useEffect(() => {
+    
+       registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    
+       notificationListener.current = Notifications.addNotificationReceivedListener(
+    
+         notification => {
+    
+           setNotification(notification);
+    
+         },
+    
+       );
+    
+       responseListener.current = Notifications.addNotificationResponseReceivedListener(
+    
+         response => {
+    
+           console.log(response);
+    
+         },
+    
+       );
+    
+       return () => {
+    
+         Notifications.removeNotificationSubscription(
+    
+           notificationListener.current,
+    
+         );
+    
+         Notifications.removeNotificationSubscription(responseListener.current);
+    
+       };
+    
+     }, []);
 
     return(
         <ScrollView 
@@ -127,6 +193,13 @@ export default function MovieScreen(){
                 movie.title
             }
         </Text>
+
+        {/*LOGICA DE STREAMING*/}
+
+        <TouchableOpacity onPress={() => navigation.navigate('VideoPlay')}>
+            <Icon name="play-circle" size={60} color="#eab308" style={{ textAlign: 'center', marginTop: 10 }} />
+        </TouchableOpacity>
+
         {/*status, release, runtime*/}
         {
             movie?.id?(
@@ -179,14 +252,14 @@ export default function MovieScreen(){
 
                     {/* Mostrar comentarios*/}
                     {comentarios?.map((comentario, index) => (
-                        <View key={index} style={estilos.comentarioItem}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Icon name="user" size={20} color="#FFF" style={{ marginRight: 8 }} />
-                                <Text style={estilos.comentarioTexto}>{comentario.texto}</Text>
+                            <View key={index} style={estilos.comentarioItem}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Icon name="user" size={20} color="#FFF" style={{ marginRight: 8 }} />
+                                    <Text style={estilos.comentarioTexto}>{comentario.texto}</Text>
+                                </View>
+                                <Text style={estilos.comentarioUsuario}>{comentario.user}</Text>
                             </View>
-                            <Text style={estilos.comentarioUsuario}>{comentario.user}</Text>
-                        </View>
-                    ))}
+                        ))}
                 </View>
 
 
@@ -200,7 +273,10 @@ export default function MovieScreen(){
                     style={estilos.textInput}
                 />
 
-                <TouchableOpacity style={estilos.button} onPress={handleEnviarComentario}>
+                <TouchableOpacity style={estilos.button} onPress={()=>{
+                    handleEnviarComentario()
+                    schedulePushNotification()
+                }}>
                     <Text style={estilos.buttonText}>Enviar Comentario</Text>
                 </TouchableOpacity>
 
@@ -254,4 +330,78 @@ const estilos = StyleSheet.create({
         fontSize: 14, 
       },
 });
+
+async function schedulePushNotification() {
+    await Notifications.scheduleNotificationAsync({
+   
+      content: {
+   
+        title: "Notificacion",
+   
+        body: 'Se agrego un comentario',
+   
+   
+      },
+   
+      trigger: {seconds: 2},
+   
+    });
+   
+   }
+
+async function registerForPushNotificationsAsync() {
+    
+    let token;
+   
+    if (Platform.OS === 'android') {
+   
+      await Notifications.setNotificationChannelAsync('default', {
+   
+        name: 'default',
+   
+        importance: Notifications.AndroidImportance.MAX,
+   
+        vibrationPattern: [0, 250, 250, 250],
+   
+        lightColor: '#FF231F7C',
+   
+      });
+   
+    }
+   
+    if (Device.isDevice) {
+   
+      const {status: existingStatus} = await Notifications.getPermissionsAsync();
+   
+      let finalStatus = existingStatus;
+   
+      if (existingStatus !== 'granted') {
+   
+        const {status} = await Notifications.requestPermissionsAsync();
+   
+        finalStatus = status;
+   
+      }
+   
+      if (finalStatus !== 'granted') {
+   
+        alert('Failed to get device push token for push notification!');
+   
+        return;
+   
+      }
+   
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+   
+      console.log(token);
+   
+    } else {
+   
+      alert('Must use a physical device for Push Notifications');
+   
+    }
+   
+    return token;
+   
+   }
 
