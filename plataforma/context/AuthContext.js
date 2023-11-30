@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const login = (email, password) => {
     setIsLoading(true);
       axios
-      .post(`http://192.168.0.111:3001/login`, {
+      .post(`http://192.168.0.108:3001/login`, {
         email,
         password,
       })
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
 
   const buscarComentarios = async () => {
     try {
-      const response = await axios.get(`http://192.168.0.111:3001/comentarios`);
+      const response = await axios.get(`http://192.168.0.108:3001/comentarios`);
       const comentarios = response.data;
       return comentarios;
     } catch (error) {
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
 
   const crearComentario = async (nuevoComentario) => {
     try {
-      const response = await axios.post(`http://192.168.0.111:3001/comentarios`, nuevoComentario);
+      const response = await axios.post(`http://192.168.0.108:3001/comentarios`, nuevoComentario);
       const comentarioCreado = response.data;
       console.log('Comentario creado:', comentarioCreado);
     } catch (error) {
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
 
   const crearUsuario = async (nuevoUsuario) => {
     try {
-      const response = await axios.post(`http://192.168.0.111:3001/sign`, nuevoUsuario);
+      const response = await axios.post(`http://192.168.0.108:3001/sign`, nuevoUsuario);
       const usuarioCreado = response.data;
       console.log('Usuario creado:', usuarioCreado);
     } catch (error) {

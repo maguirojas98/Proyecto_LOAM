@@ -1,5 +1,5 @@
-const Comentarios = require("../models/comentarios.model.js");
 const sql = require("../db/db.js");
+
 exports.create = (req,res)=>{
   const sqlp = "INSERT INTO comentarios (`user`,`texto`) VALUES (?)";
   const values =[
@@ -17,15 +17,3 @@ exports.create = (req,res)=>{
 
 }
 
-exports.list = (req, res) => {
-  console.log("entro");
-  Comentarios.getAll((err, data) => {
-    if (err) {
-      res.status(500).send({
-        message: err.message || "Error al buscar los comentarios."
-      });
-    } else {
-      res.send({ status: 200, data: data });
-    }
-  });
-};

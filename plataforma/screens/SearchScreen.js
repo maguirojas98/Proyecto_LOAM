@@ -44,7 +44,7 @@ export default function SearchScreen(){
                 />
             
                 <TouchableOpacity
-                    onPress={()=>navigation.navigate('Home')}
+                    onPress={()=>navigation.goBack()}
                     className="rounded-full p-3 m-1 bg-neutral-500"
                 >
                     <XMarkIcon size="25" color="white"/>
