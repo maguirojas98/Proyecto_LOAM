@@ -1,6 +1,6 @@
 <?php
 /*
-http://192.168.0.108/PROYECTO_FINAL/api/route.php?option=list_comentarios
+http://172.17.51.166/PROYECTO_FINAL/api/route.php?option=list_comentarios
 */
 
 header('Access-Control-Allow-Origin: *');

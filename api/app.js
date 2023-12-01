@@ -60,6 +60,6 @@ app.get("/api/generarclave/:clave", (req, res) => {
   
   
 const PORT = process.env.PORT || API_PORT
-app.listen(PORT, '192.168.0.108', () => {
+app.listen(PORT, '172.17.51.166', () => {
   console.log(`Server is running on port 3001.`);
 });

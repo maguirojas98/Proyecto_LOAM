@@ -18,13 +18,43 @@
       "supportsTablet": true
     },
     "android": {
+      "version": "1.0.0",
+      "package": "com.maguirojas.plataforma",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/image/Logo.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ecca7c5a-6b45-4de5-9069-5a9ba511ca27"
+      }
+    },
+    "owner": "maguirojas",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ecca7c5a-6b45-4de5-9069-5a9ba511ca27"
+    },
+    "build": {
+      "preview": {
+        "android": {
+          "buildType": "apk"
+        }
+      },
+      "preview2": {
+        "android": {
+          "gradleCommand": ":app:assembleRelease"
+        }
+      },
+      "preview3": {
+        "developmentClient": true
+      },
+      "production": {}
     }
   }
 }
